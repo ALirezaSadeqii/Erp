@@ -1,6 +1,23 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
-# dependencies
+# -------------------------------------------------------
+# SECRETS & ENVIRONMENT VARIABLES — never commit these!
+# -------------------------------------------------------
+.env
+.env.local
+.env.development
+.env.development.local
+.env.test
+.env.test.local
+.env.production
+.env.production.local
+.env.staging
+*.env
+# .env.example is intentionally NOT ignored — it is safe to commit
+
+# -------------------------------------------------------
+# Dependencies
+# -------------------------------------------------------
 /node_modules
 /.pnp
 .pnp.*
@@ -10,32 +27,54 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
-# next.js
+# -------------------------------------------------------
+# Next.js build output
+# -------------------------------------------------------
 /.next/
 /out/
-
-# production
 /build
 
-# misc
-.DS_Store
-*.pem
+# -------------------------------------------------------
+# Testing & coverage
+# -------------------------------------------------------
+/coverage
 
-# debug
+# -------------------------------------------------------
+# Certificates & keys
+# -------------------------------------------------------
+*.pem
+*.key
+*.p12
+*.pfx
+*.cert
+*.crt
+
+# -------------------------------------------------------
+# Debug logs
+# -------------------------------------------------------
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
+*.log
 
-# env files (can opt-in for committing if needed)
-.env*
+# -------------------------------------------------------
+# OS & editor artifacts
+# -------------------------------------------------------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/settings.json
+*.swp
+*.swo
 
-# vercel
+# -------------------------------------------------------
+# Vercel / deployment
+# -------------------------------------------------------
 .vercel
 
-# typescript
+# -------------------------------------------------------
+# TypeScript
+# -------------------------------------------------------
 *.tsbuildinfo
 next-env.d.ts

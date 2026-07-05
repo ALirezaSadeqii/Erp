@@ -37,6 +37,7 @@ CREATE TABLE IF NOT EXISTS staff (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     name TEXT NOT NULL,
     role TEXT,
+    fixed_salary NUMERIC DEFAULT 0,
     created_at TIMESTAMP DEFAULT now()
 );
 
@@ -53,11 +54,27 @@ CREATE TABLE IF NOT EXISTS visits (
     bodywork_parts_count INTEGER DEFAULT 0,
     total_amount NUMERIC,
     payment_method TEXT,
+    insurance TEXT,
+    vehicle_expense NUMERIC DEFAULT 0,
     notes TEXT,
     created_at TIMESTAMP DEFAULT now()
 );
 
 CREATE INDEX IF NOT EXISTS idx_visits_entry_date ON visits(entry_date);
+
+-- =========================
+-- STAFF LOANS
+-- =========================
+CREATE TABLE IF NOT EXISTS staff_loans (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    staff_id UUID REFERENCES staff(id) ON DELETE CASCADE,
+    amount NUMERIC NOT NULL,
+    loan_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT now()
+);
+
+CREATE INDEX IF NOT EXISTS idx_staff_loans_staff ON staff_loans(staff_id);
+CREATE INDEX IF NOT EXISTS idx_staff_loans_date ON staff_loans(loan_date);
 
 -- =========================
 -- SERVICES
@@ -81,6 +98,7 @@ ALTER TABLE cars ENABLE ROW LEVEL SECURITY;
 ALTER TABLE staff ENABLE ROW LEVEL SECURITY;
 ALTER TABLE visits ENABLE ROW LEVEL SECURITY;
 ALTER TABLE services ENABLE ROW LEVEL SECURITY;
+ALTER TABLE staff_loans ENABLE ROW LEVEL SECURITY;
 
 -- Remove open anon policies (run on existing DBs)
 DROP POLICY IF EXISTS "Allow all for anon" ON customers;
@@ -88,12 +106,14 @@ DROP POLICY IF EXISTS "Allow all for anon" ON cars;
 DROP POLICY IF EXISTS "Allow all for anon" ON staff;
 DROP POLICY IF EXISTS "Allow all for anon" ON visits;
 DROP POLICY IF EXISTS "Allow all for anon" ON services;
+DROP POLICY IF EXISTS "Allow all for anon" ON staff_loans;
 
 DROP POLICY IF EXISTS "Authenticated full access" ON customers;
 DROP POLICY IF EXISTS "Authenticated full access" ON cars;
 DROP POLICY IF EXISTS "Authenticated full access" ON staff;
 DROP POLICY IF EXISTS "Authenticated full access" ON visits;
 DROP POLICY IF EXISTS "Authenticated full access" ON services;
+DROP POLICY IF EXISTS "Authenticated full access" ON staff_loans;
 
 -- Only authenticated users can access data
 CREATE POLICY "Authenticated full access" ON customers
@@ -109,6 +129,9 @@ CREATE POLICY "Authenticated full access" ON visits
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 CREATE POLICY "Authenticated full access" ON services
+  FOR ALL TO authenticated USING (true) WITH CHECK (true);
+
+CREATE POLICY "Authenticated full access" ON staff_loans
   FOR ALL TO authenticated USING (true) WITH CHECK (true);
 
 -- Sample data (run once on fresh DB)

@@ -67,9 +67,9 @@ CREATE INDEX IF NOT EXISTS idx_visits_entry_date ON visits(entry_date);
 -- =========================
 CREATE TABLE IF NOT EXISTS staff_loans (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    staff_id UUID REFERENCES staff(id) ON DELETE CASCADE,
+    staff_id UUID NOT NULL REFERENCES staff(id) ON DELETE CASCADE,
     amount NUMERIC NOT NULL,
-    loan_date DATE NOT NULL,
+    loan_date DATE NOT NULL DEFAULT CURRENT_DATE,
     created_at TIMESTAMP DEFAULT now()
 );
 

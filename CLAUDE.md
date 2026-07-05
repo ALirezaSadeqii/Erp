@@ -59,9 +59,12 @@ Erp/
 │   ├── cars/
 │   │   └── [id]/                View a car and its full visit history
 │   │
-│   ├── staff-loans/             Staff salary advances management
+│   ├── staff-loans/             Staff salary advances management (recording only)
 │   │
-│   └── reports/                 Financial reports and summaries
+│   └── reports/                 Reports hub — daily quick stats + nav to sub-reports
+│       ├── financial/           Financial report (income, expenses, profit, by payment/service/staff/insurance/vehicle)
+│       ├── operations/          Operations report (active cars, completed, avg days in shop, parts counts)
+│       └── staff/               Staff report (performance, salary advances vs fixed salary, net payout)
 │
 ├── components/                  Reusable React components shared across pages
 │
@@ -72,7 +75,8 @@ Erp/
 │   ├── queries.js               All READ operations (SELECT queries)
 │   ├── actions.js               All WRITE operations (INSERT/UPDATE/DELETE)
 │   │                            These are Next.js Server Actions ("use server")
-│   ├── reportQueries.js         Aggregation queries for the reports page
+│   ├── reportQueries.js         Aggregation queries — getReport, getHubStats, getOperationsReport, getStaffReport
+│   ├── datePresets.js           Computes Today/This Week/This Month/This Year date ranges for report filters
 │   ├── auth.js                  Login / logout helpers
 │   └── format.js                Date, currency, text formatting utilities
 │

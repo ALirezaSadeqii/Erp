@@ -1,455 +1,144 @@
-# Developer Guide — Auto Repair Shop CRM
+# AI Developer Onboarding — Auto Repair Shop CRM
 
-This file is the single source of truth for how to work on this project.
-**Read it fully before writing any code.** If you are an AI assistant (Google Antigravity / Gemini),
-treat every rule here as a strict constraint unless the developer explicitly overrides it.
+**For any AI assistant (Gemini, Claude, GPT, or other).**
+Read this entire file before writing a single line of code.
+Then read the files listed in the Mandatory Reading section.
+Do not skip steps. Do not assume. Read first, then work.
 
 ---
 
-## What This App Does
+## Mandatory Reading — Do This First
 
-This is a CRM (Customer Relationship Management) system for an auto repair /
-bodywork shop. It manages:
+Before touching anything, read these files in this order:
 
-- **Customers** and their vehicles
-- **Workshop visits** — entry/exit dates, services performed, costs
-- **Staff** and their salary advances (loans)
-- **Financial reports** — income, expenses, payment methods, staff performance
+```
+1. CLAUDE.md or GEMINI.md          ← you are reading this now
+2. lib/queries.js                  ← understand how data is read
+3. lib/actions.js                  ← understand how data is written
+4. lib/reportQueries.js            ← understand aggregation patterns
+5. lib/datePresets.js              ← understand the date utility
+6. config/constants.js             ← understand service types, payment methods, nav
+7. app/reports/page.jsx            ← hub page pattern
+8. app/reports/financial/page.jsx  ← full report page pattern
+9. app/reports/staff/page.jsx      ← staff report pattern
+10. components/ui/Sidebar.jsx      ← nav structure
+```
 
-The app is used internally by shop staff. All users must be logged in.
-There is no public-facing content.
+If you do not read these files, your code will not match the codebase and will be rejected.
+
+---
+
+## What This App Is
+
+An internal CRM for an **auto repair and bodywork shop**. Staff use it to:
+- Record customers and their vehicles
+- Track workshop visits (entry/exit, services performed, costs)
+- Record staff salary advances (loans)
+- View financial, operational, and staff reports
+
+There is no public-facing content. All routes require login.
+The UI language is **Turkish**. All labels, messages, and button text must be in Turkish.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Version |
+| Layer | Technology | Notes |
 |---|---|---|
-| Framework | Next.js App Router | 16.2.9 |
-| UI | React | 19.2.4 |
-| Styling | Tailwind CSS | 4.x |
-| Database | Supabase (PostgreSQL 15) | — |
-| Auth | Supabase Auth — email only | — |
-| DB client | @supabase/ssr + @supabase/supabase-js | 0.12 / 2.108 |
-| Frontend hosting | Vercel | — |
-| Language | JavaScript — no TypeScript | — |
+| Framework | Next.js 16.2.9 App Router | Server Components by default |
+| UI | React 19.2.4 | `"use client"` only when needed |
+| Styling | Tailwind CSS 4.x | No inline styles. No CSS files. Tailwind only. |
+| Database | Supabase (PostgreSQL 15) | REST API via supabase-js |
+| Auth | Supabase Auth — email only | All routes protected by middleware |
+| DB client | @supabase/ssr + @supabase/supabase-js | Server-side only |
+| Language | JavaScript | NO TypeScript. No `.ts` or `.tsx` files. |
+| Path alias | `@/` = project root | Always use `@/`, never relative `../../` |
 
 ---
 
-## File Structure — Every File Explained
+## Complete File Map
 
 ```
-Erp/
-│
-├── app/                          Next.js App Router pages
-│   ├── layout.jsx               Root layout — wraps every page
-│   ├── page.jsx                 Homepage — redirects to /dashboard
-│   ├── globals.css              Global CSS / Tailwind imports
-│   ├── favicon.ico
-│   │
-│   ├── login/                   Login page (public, no auth required)
-│   │
-│   ├── dashboard/               Main dashboard — list of all visits
-│   │
-│   ├── visits/
-│   │   ├── new/                 Create a new visit form
-│   │   └── [id]/                View a single visit
-│   │       └── edit/            Edit an existing visit
-│   │
-│   ├── cars/
-│   │   └── [id]/                View a car and its full visit history
-│   │
-│   ├── staff-loans/             Staff salary advances management
-│   │
-│   └── reports/                 Financial reports and summaries
-│
-├── components/                  Reusable React components shared across pages
-│
-├── lib/                         All business logic — NO UI here
-│   ├── supabase.js              Creates the Supabase server client (uses cookies)
-│   ├── supabase/
-│   │   └── middleware.js        Refreshes auth session on every request
-│   ├── queries.js               All READ operations (SELECT queries)
-│   ├── actions.js               All WRITE operations (INSERT/UPDATE/DELETE)
-│   │                            These are Next.js Server Actions ("use server")
-│   ├── reportQueries.js         Aggregation queries for the reports page
-│   ├── auth.js                  Login / logout helpers
-│   └── format.js                Date, currency, text formatting utilities
-│
-├── supabase/
-│   ├── config.toml              Supabase project config (region, auth, etc.)
-│   ├── schema.sql               REFERENCE ONLY — human-readable full schema
-│   │                            Always keep this in sync with migrations/
-│   └── migrations/              The real source of truth for DB changes
-│       └── 20260705000000_baseline.sql   Full schema as of project start
-│
-├── middleware.js                 Next.js middleware — protects all routes
-│                                 Redirects unauthenticated users to /login
-├── Makefile                      Database deployment commands (see below)
-├── .env.local                    Local secrets — NEVER commit this file
-├── .env.example                  Template showing which env vars are needed
-├── next.config.mjs               Next.js configuration
-├── package.json                  Dependencies
-└── jsconfig.json                 Path alias — @/ maps to project root
-```
+app/
+├── layout.jsx                Root layout — wraps everything
+├── page.jsx                  Redirects to /dashboard
+├── globals.css               Tailwind imports only
+├── login/                    Login page (public)
+├── dashboard/                Visit list with full filter system
+├── visits/
+│   ├── new/                  Create visit form
+│   └── [id]/
+│       └── edit/             Edit visit form
+├── cars/
+│   └── [id]/                 Car detail + full visit history
+├── staff-loans/              Record staff salary advances (write only — not reports)
+└── reports/                  Hub — daily quick stats + navigation to sub-reports
+    ├── financial/            Income, expenses, profit by payment/service/staff/insurance/vehicle
+    ├── operations/           Active cars, completed in period, avg days, parts counts
+    └── staff/                Staff performance + advances vs salary (defaults to this month)
 
----
+lib/
+├── supabase.js               Creates server Supabase client (uses cookies for auth)
+├── supabase/middleware.js     Refreshes auth session on every request
+├── queries.js                ALL read operations — every SELECT query lives here
+├── actions.js                ALL write operations — "use server" file, INSERT/UPDATE/DELETE
+├── reportQueries.js          Aggregation queries for all report pages
+├── datePresets.js            Date range presets: Today, This Week, This Month, This Year
+├── auth.js                   Login / logout helpers
+└── format.js                 formatCurrency(), formatDate(), formatPhone()
 
-## First-Time Setup
+components/
+├── ui/
+│   ├── DashboardShell.jsx    Page wrapper — sidebar + main content area
+│   ├── Sidebar.jsx           Navigation sidebar (reads NAV_ITEMS from config/constants.js)
+│   ├── Button.jsx            Shared button component
+│   ├── Card.jsx              Shared card component
+│   └── FormFields.jsx        Shared form field components
+├── form/
+│   ├── VisitForm.jsx         Create/edit visit form (client component)
+│   ├── VisitFilters.jsx      Dashboard filter bar
+│   └── DeleteVisitButton.jsx Delete button with confirmation
+├── table/
+│   ├── VisitsTable.jsx       Visit list table
+│   └── ColumnToggle.jsx      Column visibility toggle
+└── cards/
+    └── ServiceListCard.jsx   Service line items display
 
-### 1. Prerequisites
+config/
+└── constants.js              SERVICE_TYPES, SERVICE_TYPE_LABELS, PAYMENT_METHODS,
+                              PAYMENT_METHOD_LABELS, NAV_ITEMS
 
-Install these before anything else:
+supabase/
+├── schema.sql                Human-readable schema reference — keep in sync with migrations
+├── config.toml               Supabase project config
+└── migrations/               The real source of truth for DB changes
+    └── 20260705000000_baseline.sql
 
-```bash
-node --version      # must be 18 or higher
-npm --version       # comes with Node
-supabase --version  # Supabase CLI — install from https://supabase.com/docs/guides/cli
-```
-
-Install Supabase CLI (macOS):
-```bash
-brew install supabase/tap/supabase
-```
-
-### 2. Clone and install
-
-```bash
-git clone <repo-url>
-cd Erp
-npm install
-```
-
-### 3. Create your local environment file
-
-```bash
-cp .env.example .env.local
-```
-
-Open `.env.local` and fill in the values:
-```
-NEXT_PUBLIC_SUPABASE_URL=https://hgrgcppgdtqlgpxlwyug.supabase.co
-NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_9O7wY1EiQDYtRHT2Th-ReA_9wiT3i5v
-SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
-```
-
-These values never change — the project uses one Supabase project for everything.
-
-### 4. Link the Supabase CLI to the project
-
-Do this once. It lets the Makefile talk to the live database.
-
-```bash
-supabase login      # opens browser — log in with your Supabase account
-make link           # links this repo to project hgrgcppgdtqlgpxlwyug
-```
-
-### 5. Run the app locally
-
-```bash
-npm run dev
-```
-
-Open http://localhost:3000 in your browser. Log in with your credentials.
-
----
-
-## Daily Development Workflow
-
-```
-1. Pull latest code        git pull origin main
-2. Make your changes       (see sections below)
-3. Test locally            npm run dev
-4. If DB changed           make migration name=describe_the_change
-                           (write the SQL, then: make deploy)
-5. Commit                  git add . && git commit -m "what you did"
-6. Push                    git push origin main
-7. Deploy frontend         Vercel auto-deploys on push to main (see Deployment)
+middleware.js                 Protects all routes — redirects unauthenticated → /login
+Makefile                      make migration / make deploy / make status / make link
+.env.local                    Local secrets (gitignored — never commit)
 ```
 
 ---
 
-## How to Add a New Feature
+## Database Schema
 
-Follow these steps in order. Do not skip steps.
-
-### Step 1 — Understand what needs to change
-
-Before writing a single line of code, answer these questions:
-- Does this feature need a new database table or column?
-- Which pages does it affect?
-- Does it need new read queries, write actions, or both?
-
-### Step 2 — Database changes (if needed)
-
-If the feature needs a new table or column, create a migration first.
-
-```bash
-make migration name=add_payment_installments
-```
-
-This creates a timestamped file in `supabase/migrations/`. Open that file and
-write the SQL:
-
-```sql
--- Example: adding a new column to visits
-ALTER TABLE visits ADD COLUMN IF NOT EXISTS discount NUMERIC DEFAULT 0;
-```
-
-```sql
--- Example: creating a new table
-CREATE TABLE IF NOT EXISTS invoices (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    visit_id UUID NOT NULL REFERENCES visits(id) ON DELETE CASCADE,
-    amount NUMERIC NOT NULL,
-    issued_at DATE NOT NULL DEFAULT CURRENT_DATE,
-    created_at TIMESTAMP DEFAULT now()
-);
-
-ALTER TABLE invoices ENABLE ROW LEVEL SECURITY;
-CREATE POLICY "Authenticated full access" ON invoices
-  FOR ALL TO authenticated USING (true) WITH CHECK (true);
-```
-
-Then deploy:
-```bash
-make deploy     # pushes the migration to the live database
-make status     # confirm it shows as Applied
-```
-
-Also update `supabase/schema.sql` to include the change, so it stays as an
-accurate reference for the whole schema.
-
-### Step 3 — Add read queries (if needed)
-
-All read queries live in `lib/queries.js`. Add a new exported `async function`.
-
-Pattern to follow:
-```javascript
-export async function getInvoices(visitId) {
-  const supabase = await createClient();
-
-  const { data, error } = await supabase
-    .from("invoices")
-    .select("id, visit_id, amount, issued_at, created_at")
-    .eq("visit_id", visitId)
-    .order("issued_at", { ascending: false });
-
-  if (error) {
-    return { invoices: [], error: error.message };
-  }
-
-  return { invoices: data ?? [], error: null };
-}
-```
-
-Rules for queries:
-- Always `await createClient()` at the top
-- Always handle the error — return `{ data: [], error: error.message }` pattern
-- Never put UI logic here — only database calls and light data shaping
-
-### Step 4 — Add write actions (if needed)
-
-All write operations live in `lib/actions.js`. The file starts with `"use server"`.
-
-Pattern to follow:
-```javascript
-export async function createInvoice(formData) {
-  const visitId = formData.get("visitId")?.toString();
-  const amount = parseFloat(formData.get("amount") || "0");
-
-  if (!visitId) return { error: "Visit ID required." };
-  if (!amount || amount <= 0) return { error: "Enter a valid amount." };
-
-  const supabase = await createClient();
-
-  const { error } = await supabase.from("invoices").insert({
-    visit_id: visitId,
-    amount,
-  });
-
-  if (error) {
-    return { error: `Could not create invoice: ${error.message}` };
-  }
-
-  revalidatePath(`/visits/${visitId}`);
-  return { success: true };
-}
-```
-
-Rules for actions:
-- Must be in a file that starts with `"use server"`
-- Validate all inputs before touching the database
-- Call `revalidatePath(...)` after writes so Next.js refreshes the page data
-- Return `{ error: "..." }` on failure, `{ success: true }` on success
-- Use `redirect(...)` when the user should be sent to a different page after success
-
-### Step 5 — Build the UI
-
-Pages live in `app/`. Shared components live in `components/`.
-
-- `page.jsx` files are **Server Components** by default — they can call queries directly
-- Add `"use client"` at the top only when you need interactivity (forms, state, effects)
-- Use Tailwind classes for all styling — no inline styles, no CSS files (except globals.css)
-
-Example server page that fetches and displays data:
-```jsx
-import { getInvoices } from "@/lib/queries";
-
-export default async function InvoicesPage({ params }) {
-  const { invoices, error } = await getInvoices(params.id);
-
-  if (error) return <p>Error: {error}</p>;
-
-  return (
-    <div>
-      {invoices.map((inv) => (
-        <div key={inv.id}>{inv.amount}</div>
-      ))}
-    </div>
-  );
-}
-```
-
-### Step 6 — Test everything
-
-```bash
-npm run dev
-```
-
-Go through the feature manually:
-- Does the happy path work (normal use)?
-- What happens if required fields are empty?
-- What if there is no data to display?
-- Does the page refresh correctly after a save?
-
-### Step 7 — Deploy
-
-```bash
-git add .
-git commit -m "feat: add invoice feature"
-git push origin main
-```
-
-Vercel automatically deploys the frontend on push. If you ran `make deploy`
-earlier, the database is already updated.
-
----
-
-## How to Fix a Bug
-
-### Step 1 — Reproduce it first
-
-Before changing anything, make sure you can reliably reproduce the bug locally.
-If you cannot reproduce it, you cannot verify the fix.
-
-### Step 2 — Find where the bug is
-
-Use this checklist to narrow it down:
-
-| Symptom | Likely location |
-|---|---|
-| Page shows wrong data | `lib/queries.js` — check the query and filters |
-| Form saves but nothing changes | `lib/actions.js` — check `revalidatePath` is called |
-| Form submit gives an error | `lib/actions.js` — check validation and Supabase error |
-| Page crashes with "column does not exist" | Column missing from DB — needs a migration |
-| Auth redirect loops | `middleware.js` or `lib/auth.js` |
-| Styling looks wrong | The component's Tailwind classes |
-| Data shows on server but not client | Missing `"use client"` or state management issue |
-
-### Step 3 — Fix it in the right file
-
-- Bug in how data is read → fix in `lib/queries.js`
-- Bug in how data is written → fix in `lib/actions.js`
-- Bug in what the user sees → fix in `app/` or `components/`
-- Bug caused by missing DB column → write a migration
-
-### Step 4 — Verify the fix
-
-Run `npm run dev` and confirm:
-1. The bug no longer happens
-2. Nothing else broke (check the pages that use the same code)
-
-### Step 5 — Commit and deploy
-
-```bash
-git add .
-git commit -m "fix: describe what was broken and how it is now fixed"
-git push origin main
-```
-
----
-
-## Database Workflow — The Rules
-
-**The golden rule: never change the database through the Supabase console.**
-All database changes must go through migration files and `make deploy`.
-This ensures the database state is always reproducible from code.
-
-### The migration workflow
-
-```bash
-# 1. Create a new migration file (always do this first)
-make migration name=what_you_are_changing
-
-# 2. Write the SQL in the generated file
-#    File is in supabase/migrations/ with a timestamp prefix
-
-# 3. Preview what will be pushed (optional sanity check)
-make diff
-
-# 4. Apply the migration to the live database
-make deploy
-
-# 5. Confirm it was applied
-make status
-```
-
-### Migration file rules
-
-- One logical change per migration file
-- Always use `IF NOT EXISTS` for CREATE TABLE and CREATE INDEX
-- Always use `IF NOT EXISTS` for ADD COLUMN: `ALTER TABLE t ADD COLUMN IF NOT EXISTS ...`
-- Always use `DROP POLICY IF EXISTS` before `CREATE POLICY`
-- Never delete or modify existing migration files — only add new ones
-- Name migrations clearly: `add_discount_to_visits`, `create_invoices_table`, `fix_visits_rls`
-
-### After every DB change
-
-Update `supabase/schema.sql` to reflect the new state. This file is the
-human-readable reference for the whole schema and must stay accurate.
-
-### Makefile reference
-
-| Command | What it does |
-|---|---|
-| `make link` | First-time setup: link CLI to the live project |
-| `make migration name=<name>` | Create a new empty migration file |
-| `make deploy` | Push all pending migrations to the live database |
-| `make status` | Show which migrations are applied vs pending |
-| `make diff` | Preview what SQL would be pushed (does not apply) |
-| `make pull` | Capture any console changes into a migration file |
-
----
-
-## Database Schema Reference
-
-Six tables in the `public` schema. All require authentication (RLS enabled).
+Six tables. All have RLS enabled. All require authentication.
 
 ### customers
 ```
-id            UUID (PK)
+id            UUID PK
 name          TEXT NOT NULL
-phone         TEXT NOT NULL (used as unique identifier for lookups)
+phone         TEXT NOT NULL  ← unique business identifier, used for upsert lookups
 company_name  TEXT
 created_at    TIMESTAMP
 ```
 
 ### cars
 ```
-id             UUID (PK)
-customer_id    UUID → customers.id (CASCADE DELETE)
-license_plate  TEXT UNIQUE NOT NULL
+id             UUID PK
+customer_id    UUID → customers.id CASCADE DELETE
+license_plate  TEXT UNIQUE NOT NULL  ← unique business identifier, used for upsert lookups
 vehicle_type   TEXT
 model          TEXT
 color          TEXT
@@ -459,34 +148,34 @@ created_at     TIMESTAMP
 
 ### visits
 ```
-id                       UUID (PK)
-car_id                   UUID → cars.id (CASCADE DELETE)
-entry_date               DATE NOT NULL
-exit_date                DATE (null = vehicle still in shop)
-requires_chassis_alignment  BOOLEAN DEFAULT false
-painted_parts_count      INTEGER DEFAULT 0
-bodywork_parts_count     INTEGER DEFAULT 0
-total_amount             NUMERIC
-payment_method           TEXT
-insurance                TEXT (insurance company name, if applicable)
-vehicle_expense          NUMERIC DEFAULT 0 (parts/materials cost)
-notes                    TEXT
-created_at               TIMESTAMP
+id                         UUID PK
+car_id                     UUID → cars.id CASCADE DELETE
+entry_date                 DATE NOT NULL
+exit_date                  DATE  ← NULL means car is still in the shop
+requires_chassis_alignment BOOLEAN DEFAULT false
+painted_parts_count        INTEGER DEFAULT 0
+bodywork_parts_count       INTEGER DEFAULT 0
+total_amount               NUMERIC  ← total charged to customer
+payment_method             TEXT  ← "cash", "havale", "kredi_karti", "cek"
+insurance                  TEXT  ← insurance company name if applicable
+vehicle_expense            NUMERIC DEFAULT 0  ← cost of parts/materials
+notes                      TEXT
+created_at                 TIMESTAMP
 ```
 
 ### staff
 ```
-id            UUID (PK)
+id            UUID PK
 name          TEXT NOT NULL
 role          TEXT
-fixed_salary  NUMERIC DEFAULT 0
+fixed_salary  NUMERIC DEFAULT 0  ← monthly base salary
 created_at    TIMESTAMP
 ```
 
 ### staff_loans
 ```
-id         UUID (PK)
-staff_id   UUID NOT NULL → staff.id (CASCADE DELETE)
+id         UUID PK
+staff_id   UUID NOT NULL → staff.id CASCADE DELETE
 amount     NUMERIC NOT NULL
 loan_date  DATE NOT NULL DEFAULT CURRENT_DATE
 created_at TIMESTAMP
@@ -494,10 +183,10 @@ created_at TIMESTAMP
 
 ### services
 ```
-id            UUID (PK)
-visit_id      UUID → visits.id (CASCADE DELETE)
-service_type  TEXT NOT NULL
-staff_id      UUID → staff.id (SET NULL on delete)
+id            UUID PK
+visit_id      UUID → visits.id CASCADE DELETE
+service_type  TEXT NOT NULL  ← "painting", "bodywork", "pdr", "detailing", etc.
+staff_id      UUID → staff.id SET NULL on delete
 price         NUMERIC
 notes         TEXT
 created_at    TIMESTAMP
@@ -505,264 +194,625 @@ created_at    TIMESTAMP
 
 ---
 
-## Deployment
+## The 8 Coding Patterns — Follow These Exactly
 
-### Frontend — Vercel
+### Pattern 1: Query functions in lib/queries.js
 
-The frontend deploys automatically every time you push to `main`.
+Every read operation is a named exported async function. Always:
+- `await createClient()` at the top
+- Return `{ items: [], error: error.message }` on failure
+- Return `{ items: data ?? [], error: null }` on success
+- Use `!inner` join only when you MUST filter by that relation
+- Deduplicate when using `!inner` joins (they create duplicate rows)
 
-**Initial Vercel setup (one time):**
-1. Go to vercel.com and import this Git repository
-2. Framework preset: Next.js (Vercel detects this automatically)
-3. Add these environment variables in the Vercel dashboard:
-   ```
-   NEXT_PUBLIC_SUPABASE_URL      = https://hgrgcppgdtqlgpxlwyug.supabase.co
-   NEXT_PUBLIC_SUPABASE_ANON_KEY = sb_publishable_9O7wY1EiQDYtRHT2Th-ReA_9wiT3i5v
-   SUPABASE_SERVICE_ROLE_KEY     = <your-service-role-key>
-   ```
-4. Click Deploy
+```javascript
+// lib/queries.js
+import { createClient } from "@/lib/supabase";
 
-**After initial setup**, every `git push origin main` triggers an automatic
-Vercel deployment. No manual steps needed.
+function dedupeById(rows) {
+  const seen = new Set();
+  return (rows ?? []).filter((row) => {
+    if (seen.has(row.id)) return false;
+    seen.add(row.id);
+    return true;
+  });
+}
 
-**Checking a deployment:**
-- Go to vercel.com → your project → Deployments tab
-- Red = failed (click it to see the build error log)
-- Green = live
+function ilike(value) {
+  return `%${value.trim()}%`;
+}
 
-### Database — Supabase
+export async function getThings(filters = {}) {
+  const supabase = await createClient();
 
-The database is NOT automatically deployed. You must run `make deploy`
-whenever a migration needs to be applied.
+  let query = supabase
+    .from("visits")
+    .select(`
+      id,
+      entry_date,
+      cars!inner (
+        id,
+        license_plate,
+        customers!inner (
+          name,
+          phone
+        )
+      ),
+      services (
+        service_type,
+        price,
+        staff ( name, role )
+      )
+    `)
+    .order("entry_date", { ascending: false });
 
-**Deployment order matters:**
-```
-1. make deploy          # database FIRST
-2. git push origin main # frontend SECOND
-```
+  if (filters.licensePlate) query = query.ilike("cars.license_plate", ilike(filters.licensePlate));
+  if (filters.status === "active") query = query.is("exit_date", null);
 
-Always do database first. If the frontend goes out before the DB is updated,
-the app will crash because the code expects columns that do not exist yet.
+  const { data, error } = await query;
 
----
+  if (error) {
+    console.error("getThings error:", error.message);
+    return { things: [], error: error.message };
+  }
 
-## Supabase Auth
-
-The app uses email/password authentication only. No social providers.
-
-Users must be created manually in the Supabase dashboard:
-Dashboard → Authentication → Users → Add user
-
-The middleware in `middleware.js` protects all routes. Unauthenticated users
-are redirected to `/login` automatically.
-
-Auth is handled by `lib/auth.js` and the Supabase client in `lib/supabase.js`.
-Do not bypass the auth middleware.
-
----
-
-## Code Patterns and Conventions
-
-These patterns are already established in the codebase. Follow them consistently.
-
-### Pattern 1 — Server Component fetching data
-
-```jsx
-// app/something/page.jsx
-import { getVisits } from "@/lib/queries";
-
-export default async function Page() {
-  const { visits, error } = await getVisits();
-  if (error) return <p className="text-red-600">{error}</p>;
-  return <div>{/* render visits */}</div>;
+  return { things: dedupeById(data).map(formatRow), error: null };
 }
 ```
 
-### Pattern 2 — Server Action form submission
+**IMPORTANT:** When you use `cars!inner` or `customers!inner`, Supabase multiplies rows for each match. Always run `dedupeById()` on the result.
+
+---
+
+### Pattern 2: Action functions in lib/actions.js
+
+The file starts with `"use server"`. Every write operation is a named exported async function.
+
+Rules:
+- Extract helpers: parse/validate → business logic → DB write → revalidate
+- Validate all inputs BEFORE touching the database
+- Call `revalidatePath()` for EVERY page that shows the changed data
+- Return `{ error: "Turkish error message" }` on failure
+- Use `redirect()` (not return) after successful create/update
+- Return `{ success: true }` for actions that don't redirect (e.g., add staff loan)
+
+```javascript
+// lib/actions.js
+"use server";
+
+import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { createClient } from "@/lib/supabase";
+
+// Private helpers — not exported
+function parseMyFormData(formData) {
+  const name = formData.get("name")?.toString().trim();
+  const amount = parseFloat(formData.get("amount")?.toString() || "0");
+
+  if (!name) return { error: "Ad zorunludur." };
+  if (!amount || amount <= 0) return { error: "Geçerli bir tutar giriniz." };
+
+  return { data: { name, amount } };
+}
+
+function revalidateAffectedPaths(id) {
+  revalidatePath("/dashboard");
+  revalidatePath(`/items/${id}`);
+}
+
+// Exported — callable from client components
+export async function createThing(formData) {
+  const parsed = parseMyFormData(formData);
+  if (parsed.error) return { error: parsed.error };
+
+  const supabase = await createClient();
+  const { data } = parsed;
+
+  const { data: newThing, error } = await supabase
+    .from("things")
+    .insert({ name: data.name, amount: data.amount })
+    .select("id")
+    .single();
+
+  if (error) {
+    return { error: `Kayıt oluşturulamadı: ${error.message}` };
+  }
+
+  revalidateAffectedPaths(newThing.id);
+  redirect(`/things/${newThing.id}`);
+}
+
+export async function updateThing(formData) {
+  const id = formData.get("id")?.toString();
+  if (!id) return { error: "ID gerekli." };
+
+  const parsed = parseMyFormData(formData);
+  if (parsed.error) return { error: parsed.error };
+
+  const supabase = await createClient();
+
+  const { error } = await supabase
+    .from("things")
+    .update({ name: parsed.data.name })
+    .eq("id", id);
+
+  if (error) return { error: `Güncellenemedi: ${error.message}` };
+
+  revalidateAffectedPaths(id);
+  redirect(`/things/${id}`);
+}
+```
+
+**The upsert pattern for customers/cars:** Never assume a customer or car is new. Always look up by phone (customers) or license_plate (cars), update if exists, insert if not:
+
+```javascript
+// From the actual codebase — how customers are handled
+const { data: existingCustomer } = await supabase
+  .from("customers")
+  .select("id")
+  .eq("phone", data.customerPhone)
+  .maybeSingle();
+
+if (existingCustomer) {
+  customerId = existingCustomer.id;
+  await supabase.from("customers").update({ name: data.customerName }).eq("id", customerId);
+} else {
+  const { data: newCustomer } = await supabase
+    .from("customers")
+    .insert({ name: data.customerName, phone: data.customerPhone })
+    .select("id")
+    .single();
+  customerId = newCustomer.id;
+}
+```
+
+**The delete-and-reinsert pattern for child records:**
+When updating services (or any one-to-many child), delete all existing then insert fresh:
+
+```javascript
+// Delete all services for this visit, then insert new ones
+await supabase.from("services").delete().eq("visit_id", visitId);
+if (services.length > 0) {
+  await supabase.from("services").insert(services.map(s => ({ visit_id: visitId, ...s })));
+}
+```
+
+---
+
+### Pattern 3: Report queries in lib/reportQueries.js
+
+Report queries fetch raw data with full joins, then aggregate in JavaScript — NOT in SQL. This is intentional: JS aggregation is easier to extend.
+
+```javascript
+// lib/reportQueries.js
+import { createClient } from "@/lib/supabase";
+
+export async function getMyReport({ dateFrom, dateTo } = {}) {
+  const supabase = await createClient();
+
+  // Run independent queries in parallel
+  const [visitsRes, loansRes] = await Promise.all([
+    supabase.from("visits").select("id, total_amount, entry_date").gte("entry_date", dateFrom),
+    supabase.from("staff_loans").select("amount, loan_date").gte("loan_date", dateFrom),
+  ]);
+
+  if (visitsRes.error) return { error: visitsRes.error.message };
+  if (loansRes.error) return { error: loansRes.error.message };
+
+  // Aggregate in JS
+  const visits = visitsRes.data ?? [];
+  const loans = loansRes.data ?? [];
+  const totalIncome = visits.reduce((s, v) => s + (parseFloat(v.total_amount) || 0), 0);
+  const totalLoans = loans.reduce((s, l) => s + (l.amount ?? 0), 0);
+
+  return { error: null, summary: { totalIncome, totalLoans } };
+}
+```
+
+For the hub stats, use `{ count: "exact", head: true }` for COUNT queries:
+
+```javascript
+const { count } = await supabase
+  .from("visits")
+  .select("id", { count: "exact", head: true })
+  .is("exit_date", null);
+// count = number of active cars
+```
+
+---
+
+### Pattern 4: Date presets in lib/datePresets.js
+
+Every report page that filters by date uses `getDatePresets()`. Never compute dates inline in a page component.
+
+```javascript
+import { getDatePresets, getThisMonthRange } from "@/lib/datePresets";
+
+// In a server component:
+const presets = getDatePresets(); // returns [{label, dateFrom, dateTo}, ...]
+const defaultRange = getThisMonthRange(); // { dateFrom: "2026-07-01", dateTo: "2026-07-05" }
+
+// Render presets as <a> links (not buttons):
+{presets.map((p) => {
+  const isActive = dateFrom === p.dateFrom && dateTo === p.dateTo;
+  return (
+    <a
+      key={p.label}
+      href={`/reports/financial?dateFrom=${p.dateFrom}&dateTo=${p.dateTo}`}
+      className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
+        isActive ? "bg-blue-600 text-white shadow" : "border border-slate-200 text-slate-600 hover:bg-slate-50"
+      }`}
+    >
+      {p.label}
+    </a>
+  );
+})}
+```
+
+---
+
+### Pattern 5: Server pages fetching data
+
+Pages under `app/` are Server Components by default. They call query functions directly — no API routes, no useEffect, no fetch.
 
 ```jsx
-// In a Client Component
-"use client";
-import { createVisit } from "@/lib/actions";
+// app/something/page.jsx
+import { DashboardShell } from "@/components/ui/DashboardShell";
+import { getSomething } from "@/lib/queries";
+import { formatCurrency } from "@/lib/format";
 
-export default function MyForm() {
+export const metadata = { title: "Sayfa Başlığı — Oto Servis CRM" };
+
+export default async function SomethingPage({ searchParams }) {
+  const sp = await searchParams;
+  const filter = sp?.filter ?? "";
+
+  const { items, error } = await getSomething({ filter });
+
+  if (error) {
+    return (
+      <DashboardShell>
+        <div className="p-8 text-sm text-red-600">Hata: {error}</div>
+      </DashboardShell>
+    );
+  }
+
+  return (
+    <DashboardShell>
+      <header className="border-b border-slate-200 bg-white px-8 py-6">
+        <h1 className="text-2xl font-bold text-slate-900">Başlık</h1>
+      </header>
+      <main className="flex-1 overflow-y-auto px-8 py-6">
+        {/* content */}
+      </main>
+    </DashboardShell>
+  );
+}
+```
+
+---
+
+### Pattern 6: Client components for interactivity
+
+Add `"use client"` ONLY when you need useState, useEffect, event handlers, or browser APIs. The file cannot call Supabase (server-only). Name client components with a `Client` suffix: `StaffLoansClient.jsx`.
+
+```jsx
+// app/staff-loans/StaffLoansClient.jsx
+"use client";
+
+import { useState } from "react";
+import { addStaffLoan } from "@/lib/actions";
+
+export default function StaffLoansClient({ staff }) {
   const [error, setError] = useState(null);
 
   async function handleSubmit(formData) {
-    const result = await createVisit(formData);
+    const result = await addStaffLoan(formData);
     if (result?.error) setError(result.error);
   }
 
   return (
     <form action={handleSubmit}>
-      {error && <p className="text-red-600">{error}</p>}
+      {error && (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+          {error}
+        </div>
+      )}
       {/* fields */}
     </form>
   );
 }
 ```
 
-### Pattern 3 — Supabase query in queries.js
+---
 
-```javascript
-export async function getSomething(filters = {}) {
-  const supabase = await createClient();
+### Pattern 7: Standard UI components
 
-  const { data, error } = await supabase
-    .from("table_name")
-    .select("col1, col2, related_table(col1)")
-    .eq("some_column", filters.value)
-    .order("created_at", { ascending: false });
+Use these exact Tailwind patterns — they match what's already in the codebase.
 
-  if (error) {
-    console.error("getSomething error:", error.message);
-    return { items: [], error: error.message };
-  }
-
-  return { items: data ?? [], error: null };
-}
-```
-
-### Pattern 4 — Path aliases
-
-Always use `@/` to import from the project root:
-```javascript
-import { createClient } from "@/lib/supabase";   // correct
-import { createClient } from "../../lib/supabase"; // wrong
-```
-
-### Pattern 5 — Tailwind styling
-
-Use Tailwind utility classes only. No inline `style={{}}`, no custom CSS files.
+**Summary card:**
 ```jsx
-<div className="flex items-center gap-4 p-6 bg-white rounded-xl shadow">
+<div className="rounded-2xl border border-blue-200 bg-blue-50 p-6 shadow-sm">
+  <p className="text-xs font-semibold uppercase tracking-widest text-blue-600">Etiket</p>
+  <p className="mt-3 text-3xl font-extrabold text-blue-800">{value}</p>
+  <p className="mt-1 text-xs text-blue-400">Alt başlık</p>
+</div>
+```
+
+**Section with header:**
+```jsx
+<div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+  <div className="flex items-center gap-3 border-b border-slate-100 bg-slate-50 px-6 py-4">
+    <span className="text-xl">🔧</span>
+    <h2 className="text-sm font-bold uppercase tracking-wider text-slate-600">Bölüm Başlığı</h2>
+  </div>
+  <div className="p-6">{/* content */}</div>
+</div>
+```
+
+**Error message:**
+```jsx
+<div className="rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+  Hata mesajı buraya
+</div>
+```
+
+**Empty state:**
+```jsx
+<div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white py-20 text-center shadow-sm">
+  <span className="mb-4 text-5xl">🚗</span>
+  <p className="text-lg font-semibold text-slate-700">Kayıt bulunamadı</p>
+  <p className="mt-1 text-sm text-slate-400">Açıklama</p>
+</div>
+```
+
+**Data table:**
+```jsx
+<div className="overflow-x-auto">
+  <table className="min-w-full divide-y divide-slate-100 text-sm">
+    <thead>
+      <tr className="bg-slate-50">
+        <th className="py-3 pl-4 pr-6 text-left text-xs font-semibold uppercase tracking-wider text-slate-500">Sütun</th>
+      </tr>
+    </thead>
+    <tbody className="divide-y divide-slate-100">
+      {rows.map((row) => (
+        <tr key={row.id} className="hover:bg-slate-50">
+          <td className="whitespace-nowrap py-3 pl-4 pr-6 text-slate-700">{row.value}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+```
+
+**Breadcrumb (every page must have one):**
+```jsx
+<p className="text-sm text-slate-500">
+  <Link href="/dashboard" className="hover:text-blue-600">Panel</Link>
+  {" / "}
+  <Link href="/reports" className="hover:text-blue-600">Raporlar</Link>
+  {" / Sayfa Adı"}
+</p>
 ```
 
 ---
 
-## What NOT to Do
+### Pattern 8: Reports system structure
 
-- **Never commit `.env.local`** — it contains secrets. It is gitignored.
-- **Never change the database in the Supabase console** — use migrations.
-- **Never modify existing migration files** — only add new ones.
-- **Never put database logic in page files** — it belongs in `lib/queries.js` or `lib/actions.js`.
-- **Never use `SUPABASE_SERVICE_ROLE_KEY` in frontend (client-side) code** — it bypasses all security.
-- **Never add `"use client"` to a file that does database calls** — Supabase server client only works server-side.
-- **Never push to `main` without testing locally first**.
+The reports system has 4 pages. Each has a specific role — do not mix them up.
+
+| Page | Role | Default date |
+|---|---|---|
+| `/reports` | Hub — shows today's live stats, no date filter | Always "today" |
+| `/reports/financial` | Financial analysis — requires date range | No default (show prompt) |
+| `/reports/operations` | Active cars always shown; completed filtered by date | No default |
+| `/reports/staff` | Salary advances vs performance | Defaults to this month |
+
+For hub stats, always use `getHubStats()` from `lib/reportQueries.js`.
+For sub-reports, always import `getDatePresets` and render preset buttons above the manual date form.
 
 ---
 
-## Prompting the AI Correctly
+## How to Add a New Feature
 
-When working with an AI coding assistant on this project, give it context. Vague
-prompts produce bad results. Be specific.
+Follow this order every time. Do not skip steps.
+
+### Step 1 — Does it need a DB change?
+
+If yes → create a migration first:
+```bash
+make migration name=describe_the_change
+# write SQL in the created file
+make deploy
+make status  # confirm Applied
+```
+
+Then update `supabase/schema.sql` to reflect the change.
+
+Migration SQL rules:
+- Always `IF NOT EXISTS` for CREATE TABLE / ADD COLUMN
+- Always `DROP POLICY IF EXISTS` before `CREATE POLICY`
+- Never modify existing migration files
+
+### Step 2 — Add read queries (if needed)
+
+Add to `lib/queries.js` or `lib/reportQueries.js`:
+- For simple CRUD reads → `lib/queries.js`
+- For aggregated report data → `lib/reportQueries.js`
+
+### Step 3 — Add write actions (if needed)
+
+Add to `lib/actions.js`:
+- Parse and validate first
+- Then DB write
+- Then `revalidatePath()` for all affected pages
+- Then `redirect()` or `return { success: true }`
+
+### Step 4 — Build the UI
+
+- Server component if it just displays data
+- Add `"use client"` only if it needs interactivity
+- All labels and messages in Turkish
+- Tailwind classes only — no inline `style={{}}`
+- Use `@/` imports always
+
+### Step 5 — Test it locally
+
+```bash
+npm run dev
+# open http://localhost:3000
+```
+
+Check: happy path works, empty state looks right, error state shows correctly, page refreshes after save.
+
+### Step 6 — Deploy
+
+No DB change needed:
+```bash
+git add . && git commit -m "feat: describe what you added"
+git push origin main
+# Vercel auto-deploys
+```
+
+DB change needed (ALWAYS do DB first):
+```bash
+make deploy           # DB first
+git push origin main  # frontend second
+```
+
+---
+
+## How to Fix a Bug
+
+| Symptom | Look here first |
+|---|---|
+| Page shows wrong or missing data | `lib/queries.js` — check the SELECT and filters |
+| Form saves but screen doesn't update | `lib/actions.js` — is `revalidatePath()` called for this page? |
+| Form submit returns an error | `lib/actions.js` — check validation and Supabase error message |
+| "column does not exist" crash | DB column missing — write a migration |
+| Auth redirect loop | `middleware.js` or `.env.local` (wrong Supabase URL/key) |
+| Duplicate rows in query results | Missing `dedupeById()` — you used `!inner` join without deduplication |
+| Client component can't access DB | You called Supabase inside a `"use client"` file — move DB call to server |
+| Page data is stale after action | `revalidatePath()` is missing or pointing to wrong path |
+
+---
+
+## What You Must NEVER Do
+
+These will break the app or create security issues:
+
+- **Never commit `.env.local`** — it has secrets
+- **Never change the database through the Supabase console** — use migrations
+- **Never modify existing migration files** — only add new ones
+- **Never put database logic inside page files** — use `lib/queries.js` or `lib/actions.js`
+- **Never use `SUPABASE_SERVICE_ROLE_KEY` in client-side code** — it bypasses all security
+- **Never add `"use client"` to a file that calls Supabase** — server client only works server-side
+- **Never use TypeScript** — this is a JavaScript-only project (`.js` and `.jsx` only)
+- **Never use inline `style={{}}`** — Tailwind classes only
+- **Never use relative imports like `../../lib/something`** — always use `@/lib/something`
+- **Never push to `main` without testing locally**
+- **Never deploy frontend before DB migration** — the app will crash
+
+---
+
+## Environment Variables
+
+```
+NEXT_PUBLIC_SUPABASE_URL=https://hgrgcppgdtqlgpxlwyug.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_9O7wY1EiQDYtRHT2Th-ReA_9wiT3i5v
+SUPABASE_SERVICE_ROLE_KEY=<your-service-role-key>
+```
+
+These go in `.env.local` (local) and in the Vercel dashboard (production).
+For Vercel: Project Settings → Environment Variables.
+
+---
+
+## Makefile Reference
+
+```bash
+make link                        # First-time: link Supabase CLI to live project
+make migration name=<name>       # Create a new migration file
+make deploy                      # Push pending migrations to live DB
+make status                      # Show applied vs pending migrations
+make diff                        # Preview SQL that would be pushed
+```
+
+---
+
+## Quick Cheat Sheet
+
+```bash
+# Run locally
+npm run dev
+
+# New DB migration
+make migration name=add_column_x
+# Edit the SQL file, then:
+make deploy
+
+# Full deploy (no DB change)
+git add . && git commit -m "feat: ..." && git push origin main
+
+# Full deploy (with DB change)
+make deploy && git push origin main
+```
+
+**Import pattern:**
+```javascript
+import { createClient } from "@/lib/supabase";      // DB client
+import { formatCurrency, formatDate } from "@/lib/format";  // formatting
+import { getDatePresets } from "@/lib/datePresets";  // report date ranges
+import { PAYMENT_METHOD_LABELS, SERVICE_TYPE_LABELS } from "@/config/constants";
+import { DashboardShell } from "@/components/ui/DashboardShell";
+```
+
+**Service types** (from `config/constants.js`):
+`painting`, `bodywork`, `pdr`, `detailing`, `polishing`, `ceramic`, `ppf`, `mechanical`
+
+**Payment methods** (from `config/constants.js`):
+`cash`, `havale`, `kredi_karti`, `cek`
+
+---
+
+## How to Give Good Instructions to an AI on This Project
 
 **Bad prompt:**
 > Add a discount feature
 
 **Good prompt:**
-> Add a discount field to the visits table and the create/edit visit form.
-> The discount is a numeric value (euros). It should be shown in the visit detail
-> page and subtracted from total_amount in the reports.
-> Follow the migration workflow in GEMINI.md and the existing patterns in
-> lib/actions.js and lib/queries.js.
+> Add a `discount` column (NUMERIC, default 0) to the `visits` table.
+> Show it in the create/edit visit form as "İndirim" field.
+> Subtract it from `total_amount` display on the visit detail page.
+> Include it in the financial report's summary calculations.
+> Follow CLAUDE.md/GEMINI.md workflow: migration first, then queries, then actions, then UI.
 
-**Template for new features:**
+Template for features:
 ```
 I want to add [feature name].
 
 It should work like this:
-- [describe the user experience step by step]
+- [describe step by step what happens]
 
-Database changes needed:
-- [new table or column, or "none"]
+DB changes needed:
+- [new column/table, or "none"]
 
 Files likely involved:
-- [list the files you think need to change]
+- [list the files]
 
-Follow the GEMINI.md workflow. Start with the migration if DB changes are needed,
-then queries, then actions, then the UI.
+Follow the GEMINI.md workflow. Start with the migration if needed.
 ```
 
-**Template for bug fixes:**
+Template for bugs:
 ```
-There is a bug on the [page name] page.
+Bug on [page name]:
 
-What happens:
-- [describe exactly what goes wrong]
-
-What should happen:
-- [describe the correct behaviour]
-
+What happens: [describe]
+What should happen: [describe]
 Steps to reproduce:
-1. [step 1]
-2. [step 2]
+1. [step]
+2. [step]
 
-The relevant code is probably in [file name] around line [number].
-```
-
----
-
-## Common Issues and Solutions
-
-**Problem:** `supabase: command not found`
-```bash
-brew install supabase/tap/supabase
-```
-
-**Problem:** `make link` fails with "not logged in"
-```bash
-supabase login    # then try make link again
-```
-
-**Problem:** `make deploy` fails with "migration already applied"
-The migration was already run. This is fine — check `make status` to confirm.
-
-**Problem:** Page crashes with `column "X" does not exist`
-A column the code expects is missing from the database. Create a migration:
-```bash
-make migration name=add_X_column
-# write: ALTER TABLE table_name ADD COLUMN IF NOT EXISTS X type;
-make deploy
-```
-
-**Problem:** Login works but all pages redirect back to /login
-Check that `.env.local` has the correct `NEXT_PUBLIC_SUPABASE_URL` and
-`NEXT_PUBLIC_SUPABASE_ANON_KEY` values.
-
-**Problem:** Data appears locally but not after Vercel deployment
-The Vercel environment variables are missing or wrong. Check the Vercel
-dashboard → Project → Settings → Environment Variables.
-
-**Problem:** Form submits but data does not update on screen
-The relevant `revalidatePath(...)` call is missing from the action in
-`lib/actions.js`. Add it after the successful database write.
-
-**Problem:** `npm run dev` fails with module not found
-```bash
-npm install    # reinstall dependencies
-```
-
----
-
-## Quick Reference Cheat Sheet
-
-```bash
-# Start local dev
-npm run dev
-
-# New DB migration
-make migration name=describe_the_change
-
-# Deploy DB migrations
-make deploy
-
-# Check migration status
-make status
-
-# Full deploy (DB + frontend)
-make deploy && git push origin main
-
-# Install dependencies after git pull
-npm install
+Probably in [file] around line [number].
 ```

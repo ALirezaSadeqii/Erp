@@ -183,7 +183,7 @@ function StaffCard({ person }) {
             <button
               type="button"
               onClick={() => setShowForm(true)}
-              className="flex items-center gap-2 rounded-lg border border-dashed border-blue-300 px-4 py-2.5 text-sm font-medium text-blue-600 transition hover:border-blue-400 hover:bg-blue-50"
+              className="flex items-center gap-2 rounded-lg border border-dashed border-indigo-300 px-4 py-2.5 text-sm font-medium text-indigo-600 transition hover:border-indigo-400 hover:bg-indigo-50"
             >
               <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -194,7 +194,7 @@ function StaffCard({ person }) {
             <form
               ref={formRef}
               action={handleAdd}
-              className="flex flex-wrap items-end gap-3 rounded-xl border border-blue-100 bg-blue-50/60 p-4"
+              className="flex flex-wrap items-end gap-3 rounded-xl border border-indigo-100 bg-indigo-50/60 p-4"
             >
               <input type="hidden" name="staff_id" value={person.id} />
 
@@ -213,7 +213,7 @@ function StaffCard({ person }) {
                   min="0.01"
                   required
                   placeholder="0.00"
-                  className="w-36 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="w-36 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
               </div>
 
@@ -230,7 +230,7 @@ function StaffCard({ person }) {
                   type="date"
                   defaultValue={today()}
                   required
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
                 />
               </div>
 
@@ -238,7 +238,7 @@ function StaffCard({ person }) {
                 <button
                   type="submit"
                   disabled={isPending}
-                  className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-300 disabled:opacity-50"
+                  className="rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-300 disabled:opacity-50"
                 >
                   {isPending ? "Kaydediliyor…" : "Kaydet"}
                 </button>

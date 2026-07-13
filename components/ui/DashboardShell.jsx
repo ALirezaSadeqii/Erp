@@ -13,7 +13,7 @@ export function DashboardShell({ children }) {
       {/* Main content area */}
       <div className="flex flex-1 flex-col overflow-hidden">
         {/* Top bar with toggle */}
-        <header className="flex h-12 shrink-0 items-center gap-3 border-b border-slate-200 bg-white/80 px-4 shadow-sm backdrop-blur-sm">
+        <header className="flex h-12 shrink-0 items-center gap-3 border-b border-slate-200 bg-white px-4 shadow-sm">
           <button
             onClick={() => setSidebarOpen((prev) => !prev)}
             className="flex h-8 w-8 items-center justify-center rounded-lg text-slate-500 transition-all duration-200 hover:bg-amber-50 hover:text-amber-600"

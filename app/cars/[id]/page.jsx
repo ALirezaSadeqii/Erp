@@ -27,7 +27,7 @@ export default async function CarDetailPage({ params }) {
       <header className="border-b border-slate-200 bg-white px-8 py-6">
         <div>
           <p className="text-sm text-slate-500">
-            <Link href="/dashboard" className="hover:text-blue-600">
+            <Link href="/dashboard" className="hover:text-indigo-600">
               Panel
             </Link>
             {" / Araç Detayı"}

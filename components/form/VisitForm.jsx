@@ -244,7 +244,7 @@ export function VisitForm({ staff = [], visit = null }) {
             name="requiresChassisAlignment"
             type="checkbox"
             defaultChecked={defaults?.requiresChassisAlignment}
-            className="h-4 w-4 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
+            className="h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
           />
           <label htmlFor="requiresChassisAlignment" className="text-sm text-slate-700">
             Şasi hizalama gerekiyor

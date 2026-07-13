@@ -10,13 +10,13 @@ export const metadata = {
 function StatCard({ label, value, color = "slate" }) {
   const colorMap = {
     slate: { bg: "bg-white border-slate-200", label: "text-slate-500", value: "text-slate-900" },
-    blue: { bg: "bg-blue-50 border-blue-200", label: "text-blue-600", value: "text-blue-800" },
+    blue: { bg: "bg-indigo-50 border-indigo-200", label: "text-indigo-600", value: "text-indigo-800" },
     green: { bg: "bg-emerald-50 border-emerald-200", label: "text-emerald-600", value: "text-emerald-800" },
     red: { bg: "bg-rose-50 border-rose-200", label: "text-rose-600", value: "text-rose-800" },
   };
   const c = colorMap[color] ?? colorMap.slate;
   return (
-    <div className={`rounded-2xl border p-6 shadow-sm ${c.bg}`}>
+    <div className={`rounded-xl border p-6 shadow-sm ${c.bg}`}>
       <p className={`text-xs font-semibold uppercase tracking-widest ${c.label}`}>{label}</p>
       <p className={`mt-3 text-3xl font-extrabold ${c.value}`}>{value}</p>
     </div>
@@ -27,14 +27,14 @@ function ReportTile({ href, icon, title, description }) {
   return (
     <Link
       href={href}
-      className="group flex flex-col gap-3 rounded-2xl border border-slate-200 bg-white p-8 shadow-sm transition hover:border-blue-300 hover:shadow-md"
+      className="group flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-6 shadow-sm transition hover:border-slate-300 hover:shadow-md"
     >
-      <span className="text-4xl">{icon}</span>
+      <span className="text-3xl">{icon}</span>
       <div>
-        <h2 className="text-lg font-bold text-slate-900 group-hover:text-blue-700">{title}</h2>
+        <h2 className="text-base font-bold text-slate-900 group-hover:text-indigo-700">{title}</h2>
         <p className="mt-1 text-sm text-slate-500">{description}</p>
       </div>
-      <span className="mt-auto text-sm font-semibold text-blue-600 group-hover:underline">
+      <span className="mt-auto text-sm font-semibold text-indigo-600 group-hover:underline">
         Rapora Git →
       </span>
     </Link>
@@ -49,7 +49,7 @@ export default async function ReportsHubPage() {
       <header className="border-b border-slate-200 bg-white px-8 py-6">
         <div>
           <p className="text-sm text-slate-500">
-            <Link href="/dashboard" className="hover:text-blue-600">Panel</Link>
+            <Link href="/dashboard" className="hover:text-indigo-600">Panel</Link>
             {" / Raporlar"}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-slate-900">Raporlar</h1>

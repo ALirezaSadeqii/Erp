@@ -39,7 +39,7 @@ function StaffBadges({ names }) {
       {names.map((name) => (
         <span
           key={name}
-          className="rounded-full bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700"
+          className="rounded-full bg-indigo-50 px-2 py-0.5 text-xs font-medium text-indigo-700"
         >
           {name}
         </span>
@@ -86,7 +86,7 @@ const COLUMN_DEFS = [
     render: (v) => (
       <Link
         href={`/cars/${v.carId}`}
-        className="font-semibold text-blue-600 hover:text-blue-800"
+        className="font-semibold text-indigo-600 hover:text-indigo-800"
       >
         {v.licensePlate}
       </Link>
@@ -170,7 +170,7 @@ const COLUMN_DEFS = [
     render: (v) => (
       <Link
         href={`/visits/${v.id}`}
-        className="text-slate-600 hover:text-blue-600"
+        className="text-slate-600 hover:text-indigo-600"
       >
         {formatDate(v.entryDate)}
       </Link>
@@ -345,19 +345,19 @@ export function VisitsTable({ visits }) {
       <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-slate-200">
-            <thead className="bg-slate-50">
+            <thead className="bg-slate-50 border-b border-slate-200">
               <tr>
                 {activeColumns.map((col) => (
                   <th
                     key={col.key}
-                    className={`px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 ${
+                    className={`px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 ${
                       col.align === "right" ? "text-right" : "text-left"
                     }`}
                   >
                     {col.label}
                   </th>
                 ))}
-                <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wider text-slate-500 text-left">
+                <th className="px-4 py-3 text-xs font-bold uppercase tracking-wider text-slate-500 text-left">
                   {/* actions */}
                 </th>
               </tr>
@@ -366,7 +366,7 @@ export function VisitsTable({ visits }) {
               {visits.map((visit) => (
                 <tr
                   key={visit.id}
-                  className="transition-colors hover:bg-slate-50/80"
+                  className="transition-colors hover:bg-slate-50"
                 >
                   {activeColumns.map((col) => (
                     <td
@@ -381,7 +381,7 @@ export function VisitsTable({ visits }) {
                   <td className="whitespace-nowrap px-4 py-3 text-sm">
                     <Link
                       href={`/visits/${visit.id}/edit`}
-                      className="font-medium text-blue-600 hover:text-blue-800"
+                      className="font-medium text-indigo-600 hover:text-indigo-800"
                     >
                       Düzenle
                     </Link>

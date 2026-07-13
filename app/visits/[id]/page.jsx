@@ -26,7 +26,7 @@ export default async function VisitDetailPage({ params }) {
         <div className="flex flex-wrap items-start justify-between gap-4">
           <div>
             <p className="text-sm text-slate-500">
-              <Link href="/dashboard" className="hover:text-blue-600">
+              <Link href="/dashboard" className="hover:text-indigo-600">
                 Panel
               </Link>
               {" / Ziyaret Detayı"}

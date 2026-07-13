@@ -6,7 +6,7 @@ export function Button({
 }) {
   const variants = {
     primary:
-      "bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-60",
+      "bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm disabled:opacity-60",
     secondary:
       "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60",
     danger:

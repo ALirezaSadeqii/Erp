@@ -22,7 +22,7 @@ export default function LoginPage() {
           <p className="mt-2 text-sm text-slate-500">Devam etmek için giriş yapın.</p>
         </div>
 
-        <form action={formAction} className="flex flex-col gap-4">
+        <form action={formAction} autoComplete="on" className="flex flex-col gap-4">
           <Input
             id="email"
             name="email"

@@ -21,11 +21,11 @@ export default async function EditVisitPage({ params }) {
     <DashboardShell>
       <header className="border-b border-slate-200 bg-white px-8 py-6">
         <p className="text-sm text-slate-500">
-          <Link href="/dashboard" className="hover:text-indigo-600">
+          <Link href="/dashboard" className="hover:text-blue-600">
             Panel
           </Link>
           {" / "}
-          <Link href={`/visits/${id}`} className="hover:text-indigo-600">
+          <Link href={`/visits/${id}`} className="hover:text-blue-600">
             Ziyaret Detayı
           </Link>
           {" / Düzenle"}

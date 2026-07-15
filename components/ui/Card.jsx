@@ -20,7 +20,7 @@ export function StatCard({ label, value, highlight = false, currency = false }) 
   return (
     <div
       className={`rounded-xl border p-5 shadow-sm ${
-        highlight ? "border-indigo-200 bg-indigo-50" : "border-slate-200 bg-white"
+        highlight ? "border-blue-200 bg-blue-50" : "border-slate-200 bg-white"
       }`}
     >
       <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">
@@ -28,7 +28,7 @@ export function StatCard({ label, value, highlight = false, currency = false }) 
       </p>
       <p
         className={`mt-2 text-2xl font-bold ${
-          highlight ? "text-indigo-700" : "text-slate-900"
+          highlight ? "text-blue-700" : "text-slate-900"
         }`}
       >
         {display}

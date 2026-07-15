@@ -11,7 +11,7 @@ export const metadata = {
 function SummaryCard({ label, value, sub, color = "slate" }) {
   const colorMap = {
     slate: { bg: "bg-white border-slate-200", label: "text-slate-500", value: "text-slate-900", sub: "text-slate-400" },
-    blue: { bg: "bg-indigo-50 border-indigo-200", label: "text-indigo-600", value: "text-indigo-800", sub: "text-indigo-400" },
+    blue: { bg: "bg-blue-50 border-blue-200", label: "text-blue-600", value: "text-blue-800", sub: "text-blue-400" },
     green: { bg: "bg-emerald-50 border-emerald-200", label: "text-emerald-600", value: "text-emerald-800", sub: "text-emerald-400" },
     amber: { bg: "bg-amber-50 border-amber-200", label: "text-amber-600", value: "text-amber-800", sub: "text-amber-400" },
   };
@@ -57,9 +57,9 @@ export default async function OperationsReportPage({ searchParams }) {
       <header className="border-b border-slate-200 bg-white px-8 py-6">
         <div>
           <p className="text-sm text-slate-500">
-            <Link href="/dashboard" className="hover:text-indigo-600">Panel</Link>
+            <Link href="/dashboard" className="hover:text-blue-600">Panel</Link>
             {" / "}
-            <Link href="/reports" className="hover:text-indigo-600">Raporlar</Link>
+            <Link href="/reports" className="hover:text-blue-600">Raporlar</Link>
             {" / Operasyon"}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-slate-900">Operasyon Raporları</h1>
@@ -84,7 +84,7 @@ export default async function OperationsReportPage({ searchParams }) {
                     href={`/reports/operations?dateFrom=${p.dateFrom}&dateTo=${p.dateTo}`}
                     className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                       isActive
-                        ? "bg-indigo-600 text-white shadow"
+                        ? "bg-blue-600 text-white shadow"
                         : "border border-slate-200 text-slate-600 hover:bg-slate-50"
                     }`}
                   >
@@ -103,7 +103,7 @@ export default async function OperationsReportPage({ searchParams }) {
                   name="dateFrom"
                   type="date"
                   defaultValue={dateFrom}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -115,12 +115,12 @@ export default async function OperationsReportPage({ searchParams }) {
                   name="dateTo"
                   type="date"
                   defaultValue={dateTo}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
               <button
                 type="submit"
-                className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
               >
                 Getir
               </button>
@@ -199,7 +199,7 @@ export default async function OperationsReportPage({ searchParams }) {
                           {activeCars.map((v) => (
                             <tr key={v.id} className="hover:bg-slate-50">
                               <td className="whitespace-nowrap py-3 pl-4 pr-6">
-                                <Link href={`/visits/${v.id}`} className="font-semibold text-indigo-600 hover:text-indigo-800">
+                                <Link href={`/visits/${v.id}`} className="font-semibold text-blue-600 hover:text-blue-800">
                                   {v.licensePlate}
                                 </Link>
                               </td>
@@ -250,7 +250,7 @@ export default async function OperationsReportPage({ searchParams }) {
                           {completedInPeriod.map((v) => (
                             <tr key={v.id} className="hover:bg-slate-50">
                               <td className="whitespace-nowrap py-3 pl-4 pr-6">
-                                <Link href={`/visits/${v.id}`} className="font-semibold text-indigo-600 hover:text-indigo-800">
+                                <Link href={`/visits/${v.id}`} className="font-semibold text-blue-600 hover:text-blue-800">
                                   {v.licensePlate}
                                 </Link>
                               </td>

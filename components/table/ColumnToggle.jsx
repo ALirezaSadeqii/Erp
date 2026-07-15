@@ -80,7 +80,7 @@ export function ColumnToggle({ columns, visibleKeys, onChange }) {
               <button
                 type="button"
                 onClick={selectAll}
-                className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                className="text-xs font-medium text-blue-600 hover:text-blue-800"
               >
                 Tümü
               </button>
@@ -88,7 +88,7 @@ export function ColumnToggle({ columns, visibleKeys, onChange }) {
               <button
                 type="button"
                 onClick={resetDefaults}
-                className="text-xs font-medium text-indigo-600 hover:text-indigo-800"
+                className="text-xs font-medium text-blue-600 hover:text-blue-800"
               >
                 Varsayılan
               </button>
@@ -114,7 +114,7 @@ export function ColumnToggle({ columns, visibleKeys, onChange }) {
                           type="checkbox"
                           checked={checked}
                           onChange={() => toggle(col.key)}
-                          className="h-3.5 w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                          className="h-3.5 w-3.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500"
                         />
                         <span className="text-sm text-slate-700">
                           {col.label}

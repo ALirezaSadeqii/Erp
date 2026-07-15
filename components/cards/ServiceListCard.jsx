@@ -70,14 +70,14 @@ export function VisitHistoryCard({ visits, carId }) {
               <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href={`/visits/${visit.id}`}
-                  className="text-sm font-semibold text-indigo-600 hover:text-indigo-800"
+                  className="text-sm font-semibold text-blue-600 hover:text-blue-800"
                 >
                   {formatDate(visit.entry_date)}
                   {visit.exit_date && ` — ${formatDate(visit.exit_date)}`}
                 </Link>
                 <Link
                   href={`/visits/${visit.id}/edit`}
-                  className="text-xs font-medium text-slate-500 hover:text-indigo-600"
+                  className="text-xs font-medium text-slate-500 hover:text-blue-600"
                 >
                   Düzenle
                 </Link>

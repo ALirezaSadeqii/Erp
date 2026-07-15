@@ -11,7 +11,7 @@ export const metadata = {
 function SummaryCard({ label, value, color = "slate" }) {
   const colorMap = {
     slate: { bg: "bg-white border-slate-200", label: "text-slate-500", value: "text-slate-900" },
-    blue: { bg: "bg-indigo-50 border-indigo-200", label: "text-indigo-600", value: "text-indigo-800" },
+    blue: { bg: "bg-blue-50 border-blue-200", label: "text-blue-600", value: "text-blue-800" },
     green: { bg: "bg-emerald-50 border-emerald-200", label: "text-emerald-600", value: "text-emerald-800" },
     red: { bg: "bg-rose-50 border-rose-200", label: "text-rose-600", value: "text-rose-800" },
   };
@@ -43,9 +43,9 @@ export default async function StaffReportPage({ searchParams }) {
       <header className="border-b border-slate-200 bg-white px-8 py-6">
         <div>
           <p className="text-sm text-slate-500">
-            <Link href="/dashboard" className="hover:text-indigo-600">Panel</Link>
+            <Link href="/dashboard" className="hover:text-blue-600">Panel</Link>
             {" / "}
-            <Link href="/reports" className="hover:text-indigo-600">Raporlar</Link>
+            <Link href="/reports" className="hover:text-blue-600">Raporlar</Link>
             {" / Personel"}
           </p>
           <h1 className="mt-1 text-2xl font-bold text-slate-900">Personel Raporları</h1>
@@ -67,7 +67,7 @@ export default async function StaffReportPage({ searchParams }) {
                     href={`/reports/staff?dateFrom=${p.dateFrom}&dateTo=${p.dateTo}`}
                     className={`rounded-lg px-4 py-2 text-sm font-semibold transition ${
                       isActive
-                        ? "bg-indigo-600 text-white shadow"
+                        ? "bg-blue-600 text-white shadow"
                         : "border border-slate-200 text-slate-600 hover:bg-slate-50"
                     }`}
                   >
@@ -86,7 +86,7 @@ export default async function StaffReportPage({ searchParams }) {
                   name="dateFrom"
                   type="date"
                   defaultValue={dateFrom}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
               <div className="flex flex-col gap-1.5">
@@ -98,12 +98,12 @@ export default async function StaffReportPage({ searchParams }) {
                   name="dateTo"
                   type="date"
                   defaultValue={dateTo}
-                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-200"
+                  className="rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-900 shadow-sm focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-200"
                 />
               </div>
               <button
                 type="submit"
-                className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-indigo-700"
+                className="rounded-lg bg-blue-600 px-5 py-2 text-sm font-semibold text-white shadow-sm transition hover:bg-blue-700"
               >
                 Getir
               </button>
@@ -165,7 +165,7 @@ export default async function StaffReportPage({ searchParams }) {
                                 {formatCurrency(s.netPayout)}
                               </td>
                               <td className="px-4 py-3 text-center text-slate-600">{s.serviceCount}</td>
-                              <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-indigo-700">
+                              <td className="whitespace-nowrap px-4 py-3 text-right font-medium text-blue-700">
                                 {formatCurrency(s.serviceRevenue)}
                               </td>
                             </tr>
@@ -186,7 +186,7 @@ export default async function StaffReportPage({ searchParams }) {
                             <td className="px-4 py-3 text-center font-bold text-slate-600">
                               {staff.reduce((s, p) => s + p.serviceCount, 0)}
                             </td>
-                            <td className="px-4 py-3 text-right font-bold text-indigo-700">
+                            <td className="px-4 py-3 text-right font-bold text-blue-700">
                               {formatCurrency(summary.totalServiceRevenue)}
                             </td>
                           </tr>

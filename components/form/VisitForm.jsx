@@ -208,6 +208,7 @@ export function VisitForm({ staff = [], visit = null }) {
             name="paintedPartsCount"
             type="number"
             min="0"
+            step="any"
             label="Boyalı Parça Sayısı"
             defaultValue={defaults?.paintedPartsCount ?? "0"}
           />
@@ -216,6 +217,7 @@ export function VisitForm({ staff = [], visit = null }) {
             name="bodyworkPartsCount"
             type="number"
             min="0"
+            step="any"
             label="Kaporta Parça Sayısı"
             defaultValue={defaults?.bodyworkPartsCount ?? "0"}
           />

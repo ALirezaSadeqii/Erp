@@ -2,7 +2,8 @@ name: Nightly Supabase Backup
 
 on:
   schedule:
-    - cron: '0 0 * * *'   # 03:00 Turkey every day
+    # Runs every day at 03:00 Turkey time (00:00 UTC)
+    - cron: '0 0 * * *'
 
   workflow_dispatch:
 
@@ -18,24 +19,24 @@ jobs:
 
       - name: Create Backup
         env:
-          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+          PGPASSWORD: ${{ secrets.SUPABASE_PASSWORD }}
         run: |
-          mkdir backup
+          mkdir -p backup
 
           pg_dump \
-            -h ${{ secrets.DB_HOST }} \
-            -p ${{ secrets.DB_PORT }} \
-            -U ${{ secrets.DB_USER }} \
-            -d ${{ secrets.DB_NAME }} \
+            -h "${{ secrets.SUPABASE_HOST }}" \
+            -p "${{ secrets.SUPABASE_PORT }}" \
+            -U "${{ secrets.SUPABASE_USER }}" \
+            -d "${{ secrets.SUPABASE_DB }}" \
             -Fc \
             -f backup/database.backup
 
-          zip -r backup-$(date +%F).zip backup
+          zip -r "backup-$(date +%F).zip" backup
 
       - name: Upload to Google Drive
         uses: satackey/action-google-drive@v1
 
         with:
-          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           parent_folder_id: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
           source: backup-*.zip

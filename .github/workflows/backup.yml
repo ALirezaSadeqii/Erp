@@ -1,0 +1,41 @@
+name: Nightly Supabase Backup
+
+on:
+  schedule:
+    - cron: '0 0 * * *'   # 03:00 Turkey every day
+
+  workflow_dispatch:
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Install PostgreSQL Client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client zip
+
+      - name: Create Backup
+        env:
+          PGPASSWORD: ${{ secrets.DB_PASSWORD }}
+        run: |
+          mkdir backup
+
+          pg_dump \
+            -h ${{ secrets.DB_HOST }} \
+            -p ${{ secrets.DB_PORT }} \
+            -U ${{ secrets.DB_USER }} \
+            -d ${{ secrets.DB_NAME }} \
+            -Fc \
+            -f backup/database.backup
+
+          zip -r backup-$(date +%F).zip backup
+
+      - name: Upload to Google Drive
+        uses: satackey/action-google-drive@v1
+
+        with:
+          credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}
+          parent_folder_id: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}
+          source: backup-*.zip

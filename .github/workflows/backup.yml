@@ -2,7 +2,7 @@ name: Nightly Supabase Backup
 
 on:
   schedule:
-    # Runs every day at 03:00 Turkey time (00:00 UTC)
+    # Runs every day at 00:00 UTC (03:00 Turkey during summer)
     - cron: '0 0 * * *'
 
   workflow_dispatch:
@@ -15,18 +15,16 @@ jobs:
       - name: Install PostgreSQL 17 Client
         run: |
           sudo apt-get update
-          sudo apt-get install -y wget curl gnupg lsb-release zip
+          sudo apt-get install -y zip curl gnupg ca-certificates lsb-release
 
-          sudo install -d /usr/share/postgresql-common/pgdg
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor --batch --yes -o /usr/share/keyrings/postgresql.gpg
 
-          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
-            sudo gpg --dearmor -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
-
-          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | \
-            sudo tee /etc/apt/sources.list.d/pgdg.list
+          echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
 
           sudo apt-get update
-          sudo apt-get install -y postgresql-client-17 zip
+          sudo apt-get install -y postgresql-client-17
 
           pg_dump --version
 
@@ -48,6 +46,7 @@ jobs:
 
       - name: Upload to Google Drive
         uses: satackey/action-google-drive@v1
+
         with:
           credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           parent_folder_id: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}

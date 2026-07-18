@@ -12,10 +12,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Install PostgreSQL Client
+      - name: Install PostgreSQL 17 Client
         run: |
           sudo apt-get update
-          sudo apt-get install -y postgresql-client zip
+          sudo apt-get install -y wget curl gnupg lsb-release zip
+
+          sudo install -d /usr/share/postgresql-common/pgdg
+
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | \
+            sudo gpg --dearmor -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg
+
+          echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" | \
+            sudo tee /etc/apt/sources.list.d/pgdg.list
+
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17 zip
+
+          pg_dump --version
 
       - name: Create Backup
         env:
@@ -35,7 +48,6 @@ jobs:
 
       - name: Upload to Google Drive
         uses: satackey/action-google-drive@v1
-
         with:
           credentials_json: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           parent_folder_id: ${{ secrets.GOOGLE_DRIVE_FOLDER_ID }}

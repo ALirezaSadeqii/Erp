@@ -35,93 +35,128 @@ const NAV_ICONS = {
 export function Sidebar({ isOpen, onToggle }) {
   const pathname = usePathname();
 
-  return (
+  const navLinks = (
     <>
-
-      {/* Sidebar */}
-      <aside
-        className={`sticky top-0 z-30 hidden h-screen flex-col bg-slate-900 transition-all duration-300 ease-in-out lg:flex ${
-          isOpen ? "w-64" : "w-16"
-        } overflow-hidden`}
-      >
-        {/* Logo Section */}
-        <div className={`relative flex shrink-0 flex-col items-center border-b border-slate-700/60 bg-slate-950/50 ${isOpen ? "px-4 py-4" : "px-2 py-3"}`}>
-          {isOpen ? (
-            <>
-              <div className="relative h-16 w-full overflow-hidden rounded-xl">
-                <Image
-                  src="/altik-logo.jpg"
-                  alt="Altik Auto Service"
-                  fill
-                  className="object-contain object-center"
-                  priority
-                />
-              </div>
-              <div className="mt-2 text-center">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-400/80">
-                  Premium Auto Care
-                </p>
-              </div>
-            </>
-          ) : (
-            <div className="relative h-10 w-10 overflow-hidden rounded-lg">
+      {/* Logo Section */}
+      <div className={`relative flex shrink-0 flex-col items-center border-b border-slate-700/60 bg-slate-950/50 ${isOpen ? "px-4 py-4" : "px-2 py-3"}`}>
+        {isOpen ? (
+          <>
+            <div className="relative h-16 w-full overflow-hidden rounded-xl">
               <Image
                 src="/altik-logo.jpg"
-                alt="Altik"
+                alt="Altik Auto Service"
                 fill
                 className="object-contain object-center"
                 priority
               />
             </div>
-          )}
-        </div>
+            <div className="mt-2 text-center">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-amber-400/80">
+                Premium Auto Care
+              </p>
+            </div>
+          </>
+        ) : (
+          <div className="relative h-10 w-10 overflow-hidden rounded-lg">
+            <Image
+              src="/altik-logo.jpg"
+              alt="Altik"
+              fill
+              className="object-contain object-center"
+              priority
+            />
+          </div>
+        )}
+      </div>
 
-        {/* Navigation */}
-        <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
-          {NAV_ITEMS.map((item) => {
-            const isActive =
-              pathname === item.href ||
-              (item.href !== "/dashboard" && pathname.startsWith(item.href));
+      {/* Navigation */}
+      <nav className="flex flex-1 flex-col gap-1 overflow-y-auto p-2">
+        {NAV_ITEMS.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/dashboard" && pathname.startsWith(item.href));
 
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                title={!isOpen ? item.label : undefined}
-                className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? "bg-gradient-to-r from-amber-500/20 to-amber-500/5 text-amber-400 shadow-sm ring-1 ring-amber-500/20"
-                    : "text-slate-400 hover:bg-slate-800/70 hover:text-white"
-                }`}
-              >
-                <span className={`flex shrink-0 items-center justify-center ${isActive ? "text-amber-400" : "text-slate-500 group-hover:text-slate-300"}`}>
-                  {NAV_ICONS[item.href]}
-                </span>
-                {isOpen && <span className="truncate">{item.label}</span>}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* Logout — always visible, pinned to bottom */}
-        <div className={`shrink-0 border-t border-slate-700/60 bg-slate-950/30 p-2`}>
-          <form action={logout}>
-            <button
-              type="submit"
-              title={!isOpen ? "Çıkış Yap" : undefined}
-              className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400 ${
-                !isOpen ? "justify-center" : ""
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={onToggle}
+              title={!isOpen ? item.label : undefined}
+              className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
+                isActive
+                  ? "bg-gradient-to-r from-amber-500/20 to-amber-500/5 text-amber-400 shadow-sm ring-1 ring-amber-500/20"
+                  : "text-slate-400 hover:bg-slate-800/70 hover:text-white"
               }`}
             >
-              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0">
-                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                <polyline points="16 17 21 12 16 7" />
-                <line x1="21" y1="12" x2="9" y2="12" />
-              </svg>
-              {isOpen && <span>Çıkış Yap</span>}
-            </button>
-          </form>
-        </div>
+              <span className={`flex shrink-0 items-center justify-center ${isActive ? "text-amber-400" : "text-slate-500 group-hover:text-slate-300"}`}>
+                {NAV_ICONS[item.href]}
+              </span>
+              {isOpen && <span className="truncate">{item.label}</span>}
+            </Link>
+          );
+        })}
+      </nav>
+
+      {/* Logout — always visible, pinned to bottom */}
+      <div className={`shrink-0 border-t border-slate-700/60 bg-slate-950/30 p-2`}>
+        <form action={logout}>
+          <button
+            type="submit"
+            title={!isOpen ? "Çıkış Yap" : undefined}
+            className={`flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-slate-400 transition-all duration-200 hover:bg-red-500/10 hover:text-red-400 ${
+              !isOpen ? "justify-center" : ""
+            }`}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-4 w-4 shrink-0">
+              <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+              <polyline points="16 17 21 12 16 7" />
+              <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+            {isOpen && <span>Çıkış Yap</span>}
+          </button>
+        </form>
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* ── MOBILE: slide-in drawer overlay ── */}
+      {/* Backdrop */}
+      <div
+        className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+        }`}
+        onClick={onToggle}
+        aria-hidden="true"
+      />
+      {/* Drawer panel */}
+      <aside
+        className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-slate-900 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
+          isOpen ? "translate-x-0" : "-translate-x-full"
+        }`}
+      >
+        {/* Close button inside drawer */}
+        <button
+          onClick={onToggle}
+          className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-700 hover:text-white"
+          aria-label="Menüyü kapat"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg>
+        </button>
+        {navLinks}
+      </aside>
+
+      {/* ── DESKTOP: sticky collapsible sidebar ── */}
+      <aside
+        className={`sticky top-0 z-30 hidden h-screen flex-col bg-slate-900 transition-all duration-300 ease-in-out lg:flex ${
+          isOpen ? "w-64" : "w-16"
+        } overflow-hidden`}
+      >
+        {navLinks}
       </aside>
     </>
   );

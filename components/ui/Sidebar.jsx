@@ -32,7 +32,7 @@ const NAV_ICONS = {
   ),
 };
 
-export function Sidebar({ isOpen, onToggle }) {
+export function Sidebar({ isOpen, mobileOpen, onDesktopToggle, onMobileClose, onMobileToggle }) {
   const pathname = usePathname();
 
   const navLinks = (
@@ -80,7 +80,7 @@ export function Sidebar({ isOpen, onToggle }) {
             <Link
               key={item.href}
               href={item.href}
-              onClick={onToggle}
+              onClick={onMobileClose}
               title={!isOpen ? item.label : undefined}
               className={`group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all duration-200 ${
                 isActive
@@ -125,20 +125,20 @@ export function Sidebar({ isOpen, onToggle }) {
       {/* Backdrop */}
       <div
         className={`fixed inset-0 z-40 bg-black/60 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
-        onClick={onToggle}
+        onClick={onMobileClose}
         aria-hidden="true"
       />
       {/* Drawer panel */}
       <aside
         className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-slate-900 shadow-2xl transition-transform duration-300 ease-in-out lg:hidden ${
-          isOpen ? "translate-x-0" : "-translate-x-full"
+          mobileOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         {/* Close button inside drawer */}
         <button
-          onClick={onToggle}
+          onClick={onMobileClose}
           className="absolute right-3 top-3 flex h-8 w-8 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-700 hover:text-white"
           aria-label="Menüyü kapat"
         >

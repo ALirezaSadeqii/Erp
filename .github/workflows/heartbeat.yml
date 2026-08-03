@@ -1,0 +1,41 @@
+name: Supabase Heartbeat
+
+# ── Purpose ────────────────────────────────────────────────────────────────
+# Prevents the Supabase Free project from becoming inactive by pinging a
+# lightweight API endpoint every 3 days.
+#
+# This workflow is COMPLETELY INDEPENDENT of backup.yml:
+#   - Different schedule (every 3 days vs. every day)
+#   - Different trigger time (12:00 UTC vs. 00:00 UTC — 12 hours apart)
+#   - No shared jobs, steps, secrets, tools, or logic
+#   - Does NOT install PostgreSQL, rclone, or any other tool
+#   - Makes a single HTTP request with curl and exits
+# ──────────────────────────────────────────────────────────────────────────
+
+on:
+  schedule:
+    # Every 3 days at 12:00 UTC.
+    # Backup runs daily at 00:00 UTC — 12-hour gap guarantees no overlap.
+    - cron: '0 12 */3 * *'
+
+  workflow_dispatch:
+
+jobs:
+  heartbeat:
+    name: Ping heartbeat endpoint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call heartbeat API
+        run: |
+          HTTP_STATUS=$(curl --silent --output /dev/null --write-out "%{http_code}" \
+            "https://altikautoservice.vercel.app/api/heartbeat?token=${{ secrets.HEARTBEAT_SECRET }}")
+
+          echo "HTTP status: $HTTP_STATUS"
+
+          if [ "$HTTP_STATUS" -ne 200 ]; then
+            echo "Heartbeat failed — endpoint returned HTTP $HTTP_STATUS"
+            exit 1
+          fi
+
+          echo "Heartbeat successful."

@@ -47,7 +47,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <Button type="submit" disabled={isPending} className="mt-2 w-full">
+          <Button type="submit" variant="red" disabled={isPending} className="mt-2 w-full">
             {isPending ? "Giriş yapılıyor..." : "Giriş Yap"}
           </Button>
         </form>

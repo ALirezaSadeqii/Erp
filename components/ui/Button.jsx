@@ -11,6 +11,8 @@ export function Button({
       "border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-60",
     danger:
       "border border-red-200 bg-red-50 text-red-700 hover:bg-red-100 disabled:opacity-60",
+    red:
+      "bg-red-600 text-white hover:bg-red-700 shadow-sm disabled:opacity-60",
   };
 
   return (

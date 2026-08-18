@@ -15,6 +15,13 @@ const geistMono = Geist_Mono({
 export const metadata = {
   title: "Oto Servis Yönetim Paneli",
   description: "Araç tamir servisi yönetim sistemi",
+  icons: {
+    icon: [
+      { url: "/icon.png", type: "image/png" },
+      { url: "/altik-logo.jpg", type: "image/jpeg" },
+    ],
+    apple: "/apple-icon.png",
+  },
 };
 
 export default function RootLayout({ children }) {
